@@ -15,7 +15,6 @@ SAFTEY = 3
 FOOD = 5
 GOLD = 7
 
-BODYSAFETY = 1
 
 grid = []
 otherSnakes = []
@@ -28,9 +27,9 @@ height = 0
 myHealth = 100
 myLength = 1
 mySnakeId = ''
-mode = 'foodeater'
+#mode='foodeater'
 #mode = 'foodguard'
-#mode='killer'
+mode='killer'
 def init(postData):
     global width
     global height
@@ -43,7 +42,6 @@ def init(postData):
     global goals
     global mode
     global myLength
-    global SAFTEY
 
     data = postData
 
@@ -63,6 +61,7 @@ def init(postData):
             mySnake = snake
             myLength = int(mySnake['length'])
             myHealth = int(mySnake['health'])
+
         else:
             otherSnakes.append(snake)
 
@@ -73,19 +72,24 @@ def init(postData):
         snake['coords'] = snakeCoords
  
 
-    #print('FOOD DATA ', foodData)
+    print('FOOD DATA ', foodData)
     for food in foodData:
         foods.append(food)
 
-    if(myHealth < width + height):
+        
+    if(myHealth < width+height):
         SAFTEY = 0
+
     createGoals()
+    grid[mySnake['coords'][0][0]][mySnake['coords'][0][1]]=2
+    markUnsafe()
     printGrid()
 
 
 @bottle.route('/static/<path:path>')
 def static(path):
     return bottle.static_file(path, root='static/')
+
 
 
 def createGoals():
@@ -101,10 +105,11 @@ def createGoals():
 
     print('mode=', mode)
     
+
     if mode == 'foodeater':
         print('Foodeater mode initiated')
+        print('GOALS ', goals)
         safetyAroundSnakeHead()
-        safetyAroundSnakes()
         #safetyAroundBorders()
         for food in foods:
             print('Check food vs grid ', grid[food['x']][food['y']])
@@ -114,9 +119,9 @@ def createGoals():
     elif mode == 'foodguard':
         print('Foodguard mode initiated')
         print('GOALS ', goals)
-        if(len(otherSnakes) == 1 and int((otherSnakes[0])['length']) < myLength and int((otherSnakes[0])['health']) < myHealth and myLength > 6):
+        if(len(otherSnakes) == 1 and int((otherSnakes[0])['length']) < myLength and int((otherSnakes[0])['health']) < myHealth and myLength > 6 ):
             for food in foods:
-                if((food['x']) == 0 or (food['x'] == width - 1) or (food['y']) == 0 or (food['x'] == height - 1)):
+                if((food['x'])==0 or (food['x']==width-1) or (food['y'])==0 or (food['x']==height-1)):
                     goals.append({'x':food['x'],'y':food['y'],'score':4})
                 else:
                     try:
@@ -128,6 +133,7 @@ def createGoals():
                             goals.append({'x':food['x'] - 1,'y':food['y'] + 1,'score':4})
                         if(int(grid[food['x'] - 1][food['y'] - 1]) == 0):
                             goals.append({'x':food['x'] - 1,'y':food['y'] - 1,'score':4})
+                        print('GOALS FOODGUARD', goals)
                     except:
                         pass
         else:
@@ -146,15 +152,18 @@ def createGoals():
                     y = otherSnake['coords'][0][1] + (otherSnake['coords'][0][1] - otherSnake['coords'][1][1])
                     if(int(grid[x][y]) == 0):
                         goals.append({'x':x,'y':y,'score':4})
+                        #grid[otherSnake['coords'][0][0]][otherSnake['coords'][0][1]]=0
                 except:
                     pass
                 addFoodsToGoals()
+                print('GOALS KILLER', goals)
 
             else:
                 safetyAroundSnakeHead()
                 addFoodsToGoals()
 
-    #print('mySnake coords', mySnake['coords'])
+    print('mySnake coords', mySnake['coords'])
+
 
     goals = sorted(goals, key = lambda p: distance(p,mySnake['coords'][0]))
     print('GOALS SORTED', goals)
@@ -162,9 +171,48 @@ def createGoals():
 def addFoodsToGoals():
     global goals
     global foods
-    for food in foods:               
-        if(int(grid[food['x']][food['y']]) == 0):
-            goals.append({'x':food['x'],'y':food['y'],'score':4})
+    if(myHealth<60):
+
+        for food in foods:               
+            if(int(grid[food['x']][food['y']]) == 0):
+                goals.append({'x':food['x'],'y':food['y'],'score':4})
+
+
+def markUnsafe():
+    global width
+    global height
+    global grid
+    global goals
+    global mySnake
+    global otherSnakes
+    for x in xrange(width):
+        for y in xrange(height):
+            if (grid[x][y]==0):
+                if(x!=0):
+                    leftUnsafe=int(grid[x-1][y]==1)
+                else:
+                    #if it's a wall and a food then unsafe = 0
+                    #if(int(grid[x][y])!=4):
+                    leftUnsafe=1
+                if(x!=width-1):
+                    rightUnsafe=int(grid[x+1][y]==1)
+                else:
+                    #if(int(grid[x][y])!=4):
+                    rightUnsafe=1
+                if(y!=0):
+                    toptUnsafe=int(grid[x][y-1]==1)
+                else:
+                    #if(int(grid[x][y])!=4):
+                    toptUnsafe=1
+                if(y!=height-1):
+                    bottomUnsafe=int(grid[x][y+1]==1)
+                else:
+                    #if(int(grid[x][y])!=4):
+                    bottomUnsafe=1
+
+                if(leftUnsafe+rightUnsafe+toptUnsafe+bottomUnsafe>=2):
+                    grid[x][y]=3
+                
 
 
 def printGrid():
@@ -199,7 +247,7 @@ def getGoalCoords():
     global goals
     goalCoords = []
     for goal in goals:
-        #print('GOAL COORDS ', goal, ' ',goal['x'])
+        print('GOAL COORDS ', goal, ' ',goal['x'])
         goalCoords.append([goal['x'],goal['y']])
     return goalCoords
 
@@ -208,19 +256,13 @@ def safetyAroundBorders():
     global grid
     global height
     global width
-    global SAFTEY
     for x in xrange(width):
-        if(grid[x][0] != SNAKE):
-            grid[x][0] = SAFTEY
-        if(grid[x][height - 1] != SNAKE):
-            grid[x][height - 1] = SAFTEY
+        grid[x][0]=SAFTEY
+        grid[x][height-1]=SAFTEY
 
     for y in xrange(height):
-        if(grid[0][y] != SNAKE):
-            grid[0][y] = SAFTEY
-        if(grid[width - 1][y] != SNAKE):
-            grid[width - 1][y] = SAFTEY
-
+        grid[0][y]=SAFTEY
+        grid[width-1][y]=SAFTEY
 
 def safetyAroundSnakeHead():
     global otherSnakes
@@ -229,14 +271,14 @@ def safetyAroundSnakeHead():
     global SAFTEY
     global height
     global width
+    global SNAKE
 
     print('other snakes = ', otherSnakes)
     for otherSnake in otherSnakes:
-        #print('other snake length = ', int(otherSnake['length']), ' my length
-        #', myLength)
-        #print('condition= ', int(otherSnake['length']) >= myLength)
+        print('other snake length = ', int(otherSnake['length']), ' my length ', myLength)
+        print('condition= ', int(otherSnake['length']) >= myLength)
         if (int(otherSnake['length']) >= myLength):
-            #dodge head
+            #dodge head        
             try:
                 x = otherSnake['coords'][0][0] + 1
                 y = otherSnake['coords'][0][1] 
@@ -293,84 +335,35 @@ def safetyAroundSnakeHead():
                     grid[x][y] = 3
             except:
                 pass
+            #grid[otherSnake['coords'][1][0]][otherSnake['coords'][1][1]]=SNAKE
 
-
-def safetyAroundSnakes():
-    global grid
-    global otherSnakes
-    for otherSnake in otherSnakes:
-        for i in xrange(otherSnake['length']-3):
-            safetyAroundCell(otherSnake['coords'][i])
-
-def safetyAroundCell(coord):
-    global grid
-    global SAFTEY
-    x = coord[0]
-    y = coord[1]
-    
-    try:
-        if(grid[x + 1][y] != SNAKE):
-            grid[x + 1][y] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x + 1][y + 1] != SNAKE):
-            grid[x + 1][y + 1] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x + 1][y - 1] != SNAKE):
-            grid[x + 1][y - 1] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x][y + 1] != SNAKE):
-            grid[x][y + 1] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x][y - 1] != SNAKE):
-            grid[x][y - 1] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x - 1][y + 1] != SNAKE):
-            grid[x - 1][y + 1] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x - 1][y - 1] != SNAKE):
-            grid[x - 1][y - 1] = SAFTEY
-    except:
-        pass
-    try:
-        if(grid[x - 1][y] != SNAKE):
-            grid[x - 1][y] = SAFTEY
-    except:
-        pass
 
 @bottle.get('/')
 def index():
     print('WORKING ON GET REQUEST')
     head_url = '%s://%s/static/Traitor.gif' % (bottle.request.urlparts.scheme, bottle.request.urlparts.netloc)
     return {
-        'color': '#ff0000',
-        'head': head_url
+        'color': '#00ffff',
+        'head': head_url,
+        
     }
 
-@bottle.post('//start')
+@bottle.post('/start')
 def start():
     print('WORKING ON START REQUEST')
+    head_url = '%s://%s/static/Traitor.gif' % (bottle.request.urlparts.scheme, bottle.request.urlparts.netloc)
     return {
-        'name': 'PunisherSnake',
-        'color': '#FF0000',
+        'name': 'RomanInitial',
+        'color': '#0000FF',
         'head_type': 'fang',
-        'tail_type': 'round-bum',
-        'taunt': 'battlesnake-python!',
-        'secondary_color': '#FF00FF'
+        'tail_type': 'small-rattle',
+        'taunt': 'battlesnake 2018',
+        'secondary_color': '#FF00FF',
+        'head_url': head_url
+
     }
 
-@bottle.post('//move')
+@bottle.post('/move')
 def move():
     global width
     global height
@@ -390,7 +383,7 @@ def move():
             
     mySnake_head = mySnake['coords'][0]
     mySnake_coords = mySnake['coords']
-    #print('my snake coords are ', mySnake_coords)
+    print('my snake coords are ', mySnake_coords)
     path = None
 
     #goals = sorted(goals, key=itemgetter('score'))
@@ -405,19 +398,19 @@ def move():
             printGrid()
             continue
 
-        #print('for goal ', goal)
-        #print('temporary path is ', tentative_path)
+        print('for goal ', goal)
+        print('temporary path is ', tentative_path)
         
         path_length = len(tentative_path)
-        #print('this path has length is ', path_length)
+        print('this path has length is ', path_length)
         # Update snake
-        #print('path length is ', path_length)
-        #print('mySnake length is ', myLength)
-        if path_length < myLength + 1:
-            remainder = myLength + 1 - path_length
+        print('path length is ', path_length)
+        print('mySnake length is ', myLength)
+        if path_length < myLength+1:
+            remainder = myLength +1- path_length
             new_mySnake_coords = list(reversed(tentative_path)) + mySnake_coords[:remainder]
         else:
-            new_mySnake_coords = list(reversed(tentative_path))[:myLength + 1]
+            new_mySnake_coords = list(reversed(tentative_path))[:myLength+1]
 
         if grid[new_mySnake_coords[0][0]][new_mySnake_coords[0][1]] == goal:
             # we ate goal so we grow
@@ -437,60 +430,60 @@ def move():
             print('Before break')
             break
 
-    #print('path before if ',path)
+    print('path before if ',path)
     if not path:
         path = a_star(mySnake_head, mySnake['coords'][-1], grid, mySnake_coords)
-    #print('path after if ',path)
+    print('path after if ',path)
 
     despair = not (path and len(path) > 1)
-    #print('despair first time', despair)
+    print('despair first time', despair)
 
     if despair:
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2,3]):
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('i\'m scared')
-            if(path):
-                break
+            #if (path):
+            break
 
     despair = not (path and len(path) > 1)
 
-    #print('despair second time time', despair)
+    print('despair second time time', despair)
     if despair:
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2]):
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('like so scared')
-            if(path):
-                break
+            break
 
-    #print('path before asserts ', path)
+    print('path before asserts ', path)
     if path:
         assert path[0] == tuple(mySnake_head)
         assert len(path) > 1
 
-    #print('path after asserts ', path)
+    print('path after asserts ', path)
     #print(grid)
     moveTo = ''
     try:
-        #print('try move to')
-        moveTo = direction(path[0], path[1])     
+        print('try move to')
+        moveTo = direction(path[0], path[1])    
     except:
         try:
-            if ((grid[mySnake['coords'][0][0] + 1][mySnake['coords'][0][1]] != 1) and (mySnake['coords'][0][0] !=width-1)):
+            if (grid[mySnake['coords'][0][0] + 1][mySnake['coords'][0][1]] != 1 and mySnake['coords'][0][0]!=width-1):
                 moveTo = "right"
         except:
             pass
         try:
-            if ((grid[mySnake['coords'][0][0] - 1][mySnake['coords'][0][1]] != 1) and (mySnake['coords'][0][0] !=0)):
-                moveTo = "left"     
+            if (grid[mySnake['coords'][0][0] - 1][mySnake['coords'][0][1]] != 1 and mySnake['coords'][0][0]!=0):
+                moveTo = "left"
+        
         except:
             pass
         try:
-            if ((grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] + 1] != 1) and (mySnake['coords'][0][1] !=height-1)):
+            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] + 1] != 1  and mySnake['coords'][0][1]!=height-1):
                 moveTo = "down"
         except:
             pass
         try:
-            if ((grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] - 1] != 1) and (mySnake['coords'][0][1] !=0)):
+            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] - 1] != 1  and mySnake['coords'][0][1]!=0):
                 moveTo = "up"
         except:
             pass
@@ -501,9 +494,9 @@ def move():
     }
     
 
+
 @bottle.post('/end')
 def end():
-    data = bottle.request.json
     return {
         'taunt': 'amen!'
     }
