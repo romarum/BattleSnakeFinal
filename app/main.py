@@ -299,8 +299,8 @@ def safetyAroundSnakes():
     global grid
     global otherSnakes
     for otherSnake in otherSnakes:
-        for coord in xrange(otherSnake['length']-3):
-            safetyAroundCell(coord)
+        for i in xrange(otherSnake['length']-3):
+            safetyAroundCell(otherSnake['coords'][i])
 
 def safetyAroundCell(coord):
     global grid
