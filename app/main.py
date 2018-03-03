@@ -155,6 +155,8 @@ def createGoals():
     #print('mySnake coords', mySnake['coords'])
 
     goals = sorted(goals, key = lambda p: distance(p,mySnake['coords'][0]))
+    if(len(goals)==0):
+        goals.append({'x':width/2,'y':height/2,'score':4})
     print('GOALS SORTED', goals)
 
 def addFoodsToGoals():
@@ -459,7 +461,8 @@ def move():
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2]):
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('like so scared')
-            break
+            if(path):
+                break
 
     #print('path before asserts ', path)
     if path:
@@ -471,26 +474,25 @@ def move():
     moveTo = ''
     try:
         #print('try move to')
-        moveTo = direction(path[0], path[1])
-        
+        moveTo = direction(path[0], path[1])     
     except:
         try:
-            if (grid[mySnake['coords'][0][0] + 1][mySnake['coords'][0][1]] != 1):
+            if (grid[mySnake['coords'][0][0] + 1][mySnake['coords'][0][1]] != 1 and mySnake['coords'][0][0] !=width-1):
                 moveTo = "right"
         except:
             pass
         try:
-            if (grid[mySnake['coords'][0][0] - 1][mySnake['coords'][0][1]] != 1):
+            if (grid[mySnake['coords'][0][0] - 1][mySnake['coords'][0][1]] != 1 and mySnake['coords'][0][0] !=0):
                 moveTo = "left"     
         except:
             pass
         try:
-            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] + 1] != 1):
+            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] + 1] != 1 and mySnake['coords'][0][1] !=height-1):
                 moveTo = "down"
         except:
             pass
         try:
-            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] - 1] != 1):
+            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] - 1] != 1 and mySnake['coords'][0][1] !=0):
                 moveTo = "up"
         except:
             pass
