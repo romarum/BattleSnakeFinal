@@ -451,8 +451,8 @@ def move():
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2,3]):
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('i\'m scared')
-            #if (path):
-            break
+            if (path):
+               break
 
     despair = not (path and len(path) > 1)
 
@@ -462,7 +462,7 @@ def move():
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('like so scared')
             if(path):
-                break
+               break
 
     #print('path before asserts ', path)
     if path:
