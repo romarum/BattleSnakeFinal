@@ -43,6 +43,7 @@ def init(postData):
     global goals
     global mode
     global myLength
+    global SAFTEY
 
     data = postData
 
@@ -76,7 +77,8 @@ def init(postData):
     for food in foodData:
         foods.append(food)
 
-
+    if(myHealth < width + height):
+        SAFTEY = 0
     createGoals()
     printGrid()
 
@@ -208,6 +210,7 @@ def safetyAroundBorders():
     global grid
     global height
     global width
+    global SAFTEY
     for x in xrange(width):
         if(grid[x][0] != SNAKE):
             grid[x][0] = SAFTEY
@@ -229,9 +232,6 @@ def safetyAroundSnakeHead():
     global height
     global width
 
-    if(myHealth < width + height):
-        SAFTEY = 0
-
     print('other snakes = ', otherSnakes)
     for otherSnake in otherSnakes:
         #print('other snake length = ', int(otherSnake['length']), ' my length
@@ -243,56 +243,56 @@ def safetyAroundSnakeHead():
                 x = otherSnake['coords'][0][0] + 1
                 y = otherSnake['coords'][0][1] 
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] + 1
                 y = otherSnake['coords'][0][1] + 1
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] + 1
                 y = otherSnake['coords'][0][1] - 1
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] 
                 y = otherSnake['coords'][0][1] + 1
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] 
                 y = otherSnake['coords'][0][1] - 1
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] - 1
                 y = otherSnake['coords'][0][1] + 1
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] - 1
                 y = otherSnake['coords'][0][1] - 1
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
             try:
                 x = otherSnake['coords'][0][0] - 1
                 y = otherSnake['coords'][0][1] 
                 if(grid[x][y] != SNAKE):
-                    grid[x][y] = SAFTEY
+                    grid[x][y] = 3
             except:
                 pass
 
