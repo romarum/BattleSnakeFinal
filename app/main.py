@@ -107,7 +107,7 @@ def createGoals():
         print('Foodeater mode initiated')
         print('GOALS ', goals)
         safetyAroundSnakeHead()
-        safetyAroundBorders()
+        #safetyAroundBorders()
         for food in foods:
             print('Check food vs grid ', grid[food['x']][food['y']])
             if(int(grid[food['x']][food['y']]) == 0):
@@ -141,7 +141,7 @@ def createGoals():
     elif mode == 'killer':
         print('Killer mode initiated')
         print('GOALS ', goals)
-        safetyAroundBorders()
+        #safetyAroundBorders()
         for otherSnake in otherSnakes:
             if(int((otherSnake)['length']) < myLength):
                 try:
