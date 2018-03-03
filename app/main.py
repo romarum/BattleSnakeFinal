@@ -306,10 +306,10 @@ def safetyAroundSnakes():
 
 def safetyAroundCell(coord):
     global grid
-
+    print("COORD=",coord)
     x = coord[0]
     y = coord[1]
-
+    
     try:
         x = x + 1
         y = y
