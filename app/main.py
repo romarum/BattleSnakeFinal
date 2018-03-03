@@ -157,8 +157,6 @@ def createGoals():
     #print('mySnake coords', mySnake['coords'])
 
     goals = sorted(goals, key = lambda p: distance(p,mySnake['coords'][0]))
-    if(len(goals)==0):
-        goals.append({'x':width/2,'y':height/2,'score':4})
     print('GOALS SORTED', goals)
 
 def addFoodsToGoals():
