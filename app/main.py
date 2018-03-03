@@ -128,7 +128,6 @@ def createGoals():
                             goals.append({'x':food['x'] - 1,'y':food['y'] + 1,'score':4})
                         if(int(grid[food['x'] - 1][food['y'] - 1]) == 0):
                             goals.append({'x':food['x'] - 1,'y':food['y'] - 1,'score':4})
-                        print('GOALS FOODGUARD', goals)
                     except:
                         pass
         else:
@@ -200,7 +199,7 @@ def getGoalCoords():
     global goals
     goalCoords = []
     for goal in goals:
-        print('GOAL COORDS ', goal, ' ',goal['x'])
+        #print('GOAL COORDS ', goal, ' ',goal['x'])
         goalCoords.append([goal['x'],goal['y']])
     return goalCoords
 
@@ -311,59 +310,43 @@ def safetyAroundCell(coord):
     y = coord[1]
     
     try:
-        x = x + 1
-        y = y
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x+1][y] != SNAKE):
+            grid[x+1][y] = SAFTEY
     except:
         pass
     try:
-        x = x + 1
-        y = y + 1
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x+1][y+1] != SNAKE):
+            grid[x+1][y+1] = SAFTEY
     except:
         pass
     try:
-        x = x + 1
-        y = y - 1
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x+1][y-1] != SNAKE):
+            grid[x+1][y-1] = SAFTEY
     except:
         pass
     try:
-        x = x
-        y = y + 1
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x][y+1] != SNAKE):
+            grid[x][y+1] = SAFTEY
     except:
         pass
     try:
-        x = x
-        y = y - 1
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x][y-1] != SNAKE):
+            grid[x][y-1] = SAFTEY
     except:
         pass
     try:
-        x = x - 1
-        y = y + 1
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x-1][y+1] != SNAKE):
+            grid[x-1][y+1] = SAFTEY
     except:
         pass
     try:
-        x = x - 1
-        y = y - 1
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x-1][y-1] != SNAKE):
+            grid[x-1][y-1] = SAFTEY
     except:
         pass
     try:
-        x = x - 1
-        y = y
-        if(grid[x][y] != SNAKE):
-            grid[x][y] = SAFTEY
+        if(grid[x-1][y] != SNAKE):
+            grid[x-1][y] = SAFTEY
     except:
         pass
 
@@ -408,7 +391,7 @@ def move():
             
     mySnake_head = mySnake['coords'][0]
     mySnake_coords = mySnake['coords']
-    print('my snake coords are ', mySnake_coords)
+    #print('my snake coords are ', mySnake_coords)
     path = None
 
     #goals = sorted(goals, key=itemgetter('score'))
@@ -423,14 +406,14 @@ def move():
             printGrid()
             continue
 
-        print('for goal ', goal)
-        print('temporary path is ', tentative_path)
+        #print('for goal ', goal)
+        #print('temporary path is ', tentative_path)
         
         path_length = len(tentative_path)
-        print('this path has length is ', path_length)
+        #print('this path has length is ', path_length)
         # Update snake
-        print('path length is ', path_length)
-        print('mySnake length is ', myLength)
+        #print('path length is ', path_length)
+        #print('mySnake length is ', myLength)
         if path_length < myLength:
             remainder = myLength - path_length
             new_mySnake_coords = list(reversed(tentative_path)) + mySnake_coords[:remainder]
@@ -455,13 +438,13 @@ def move():
             print('Before break')
             break
 
-    print('path before if ',path)
+    #print('path before if ',path)
     if not path:
         path = a_star(mySnake_head, mySnake['coords'][-1], grid, mySnake_coords)
-    print('path after if ',path)
+    #print('path after if ',path)
 
     despair = not (path and len(path) > 1)
-    print('despair first time', despair)
+    #print('despair first time', despair)
 
     if despair:
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2,3]):
@@ -472,23 +455,23 @@ def move():
 
     despair = not (path and len(path) > 1)
 
-    print('despair second time time', despair)
+    #print('despair second time time', despair)
     if despair:
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2]):
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('like so scared')
             break
 
-    print('path before asserts ', path)
+    #print('path before asserts ', path)
     if path:
         assert path[0] == tuple(mySnake_head)
         assert len(path) > 1
 
-    print('path after asserts ', path)
+    #print('path after asserts ', path)
     #print(grid)
     moveTo = ''
     try:
-        print('try move to')
+        #print('try move to')
         moveTo = direction(path[0], path[1])
         
     except:
