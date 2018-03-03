@@ -101,7 +101,6 @@ def createGoals():
     
     if mode == 'foodeater':
         print('Foodeater mode initiated')
-        print('GOALS ', goals)
         safetyAroundSnakeHead()
         safetyAroundSnakes()
         #safetyAroundBorders()
@@ -300,7 +299,7 @@ def safetyAroundSnakes():
     global grid
     global otherSnakes
     for otherSnake in otherSnakes:
-        for coord in otherSnake['coords']:
+        for coord in xrange(otherSnake['length']-3):
             safetyAroundCell(coord)
 
 def safetyAroundCell(coord):
