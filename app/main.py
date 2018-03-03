@@ -312,7 +312,7 @@ def index():
 def start():
     print('WORKING ON START REQUEST')
     return {
-        'name': 'RomanInitial',
+        'name': 'PunisherSnake',
         'color': '#FF0000',
         'head_type': 'fang',
         'tail_type': 'round-bum',
