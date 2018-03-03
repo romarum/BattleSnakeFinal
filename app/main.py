@@ -449,8 +449,8 @@ def move():
         for neighbour in neighbours(mySnake_head,grid,0,mySnake_coords, [1,2,3]):
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('i\'m scared')
-            if (path):
-               break
+            if(path):
+                break
 
     despair = not (path and len(path) > 1)
 
@@ -460,7 +460,7 @@ def move():
             path = a_star(mySnake_head, neighbour, grid, mySnake_coords)
             print('like so scared')
             if(path):
-               break
+                break
 
     #print('path before asserts ', path)
     if path:
@@ -475,22 +475,22 @@ def move():
         moveTo = direction(path[0], path[1])     
     except:
         try:
-            if (grid[mySnake['coords'][0][0] + 1][mySnake['coords'][0][1]] != 1 and mySnake['coords'][0][0] !=width-1):
+            if ((grid[mySnake['coords'][0][0] + 1][mySnake['coords'][0][1]] != 1) and (mySnake['coords'][0][0] !=width-1)):
                 moveTo = "right"
         except:
             pass
         try:
-            if (grid[mySnake['coords'][0][0] - 1][mySnake['coords'][0][1]] != 1 and mySnake['coords'][0][0] !=0):
+            if ((grid[mySnake['coords'][0][0] - 1][mySnake['coords'][0][1]] != 1) and (mySnake['coords'][0][0] !=0)):
                 moveTo = "left"     
         except:
             pass
         try:
-            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] + 1] != 1 and mySnake['coords'][0][1] !=height-1):
+            if ((grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] + 1] != 1) and (mySnake['coords'][0][1] !=height-1)):
                 moveTo = "down"
         except:
             pass
         try:
-            if (grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] - 1] != 1 and mySnake['coords'][0][1] !=0):
+            if ((grid[mySnake['coords'][0][0]][mySnake['coords'][0][1] - 1] != 1) and (mySnake['coords'][0][1] !=0)):
                 moveTo = "up"
         except:
             pass
